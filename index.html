@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>视频</title>
+</head>
+<body>
+<canvas id="canvas" style="background-color: #ccc" width=400 height=225>
+        </canvas>
+    <video src="movie3.mp4" style="width: 400px" controls></video>
+<script>
+    //卷积核后面再研究
+//    var filter = [[-1,-1,-1],[-1,8,-1],[-1,-1,-1]];
+    window.onload = function(){
+        canvas = document.getElementById('canvas');
+        cobj = canvas.getContext('2d');
+        video = document.getElementsByTagName('video')[0];
+//            video.play();
+            video.addEventListener('play', function(){
+                setInterval(function(){
+                    cobj.drawImage(video, 0, 0, 400, 225);
+                    cobj.putImageData(dealCanvas(),0,0)
+                }, 20);
+            });
+    }
+    var CHECK_R;// = 30;
+    var CHECK_G;// = 150;
+    var CHECK_B;// = 35;
+    var TOLERANCE = 55
+    function dealCanvas() {
+        var frameData = cobj.getImageData(0,0,400,225)
+//        console.info(frameData)
+        var len = frameData.data.length/ 4;
+        for ( var i = 0; i < len; i++) {
+             var r = frameData.data[i * 4 + 0],
+                g = frameData.data[i * 4 + 1],
+                b = frameData.data[i * 4 + 2];
+            if (CHECK_R == undefined){
+                CHECK_R = r;
+                CHECK_G = g;
+                CHECK_B = b;
+            }
+            if (  Math.abs(r - CHECK_R) <= TOLERANCE
+                && Math.abs(g - CHECK_G) <= TOLERANCE
+                && Math.abs(b - CHECK_B) <= TOLERANCE) {
+                frameData.data[i * 4 + 3] = 0;
+            }
+        }
+
+        return frameData
+    }
+</script>
+</body>
+</html>
